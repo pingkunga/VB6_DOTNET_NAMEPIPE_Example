@@ -1,0 +1,1 @@
+VB6PipeServer not include for code example
