@@ -101,8 +101,8 @@ Option Explicit
 
 Private Sub cmdPipeSend_Click()
     Dim message             As String
-    Dim messageByte()       As Byte
-    Dim bArray()            As Byte
+    Dim messageInByte()     As Byte
+    Dim messageOutByte()    As Byte
     Dim cbRead              As Long
     Dim res                 As Long
     Dim temp                As String
@@ -114,26 +114,26 @@ Private Sub cmdPipeSend_Click()
     'messageByte = StrConv(message, vbFromUnicode)          '<--- THIS CODE NOT WORKING (NOT COMPACT WITH .NET UNICODE
     
     'BEGIN: THIS CODE CONVERT EACH CHARACTOR TO ASCII FROM SUPPORT ENGLISH + THAI
-    ReDim messageByte(Len(message))
+    ReDim messageInByte(Len(message))
     lmessageByteCount = 1
     For lmessageByteCount = 1 To Len(message)
-        messageByte(lmessageByteCount) = Asc(Mid$(message, lmessageByteCount, 1))
+        messageInByte(lmessageByteCount) = Asc(Mid$(message, lmessageByteCount, 1))
     Next
     'END: THIS CODE CONVERT EACH CHARACTOR TO ASCII FROM SUPPORT ENGLISH + THAI
     
-    ReDim bArray(BUFFSIZE)  'Build the return buffer
+    ReDim messageOutByte(BUFFSIZE)  'Build the return buffer
      
     res = CallNamedPipe(szPipeName _
-                      , messageByte(0) _
-                      , UBound(messageByte) + 1 _
-                      , bArray(0) _
-                      , UBound(bArray) + 1 _
+                      , messageInByte(0) _
+                      , UBound(messageInByte) + 1 _
+                      , messageOutByte(0) _
+                      , UBound(messageOutByte) + 1 _
                       , cbRead _
                       , 30000)  'Wait up to 30 seconds for a response
 
     If res > 0 Then
         Dim c As Variant
-        For Each c In bArray
+        For Each c In messageOutByte
             temp = temp & Chr(c)
         Next c
         temp = Left$(temp, cbRead)
